@@ -130,7 +130,7 @@ public class MapperMethod {
       RowBounds rowBounds = method.extractRowBounds(args);
       sqlSession.select(command.getName(), param, rowBounds, method.extractResultHandler(args));
     } else {
-      sqlSession.select(command.getName(), param, method.extractResultHandler(args));
+      sqlSession.select(command.getName(), param, method.extractResultHandler(args)); 
     }
   }
 
