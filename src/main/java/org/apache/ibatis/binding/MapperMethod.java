@@ -55,16 +55,20 @@ public class MapperMethod {
     Object result;
     switch (command.getType()) {
       case INSERT: {
+        // 每次执行都会将参数封装到 Map 中去
     	Object param = method.convertArgsToSqlCommandParam(args);
+    	// 然后传入 statementId 以及参数调用 SqlSession 的 insert 方法
         result = rowCountResult(sqlSession.insert(command.getName(), param));
         break;
       }
       case UPDATE: {
+        // 每次执行都会将参数封装到 Map 中去
         Object param = method.convertArgsToSqlCommandParam(args);
         result = rowCountResult(sqlSession.update(command.getName(), param));
         break;
       }
       case DELETE: {
+        // 每次执行都会将参数封装到 Map 中去
         Object param = method.convertArgsToSqlCommandParam(args);
         result = rowCountResult(sqlSession.delete(command.getName(), param));
         break;
@@ -80,6 +84,7 @@ public class MapperMethod {
         } else if (method.returnsCursor()) {
           result = executeForCursor(sqlSession, args);
         } else {
+          // 每次执行都会将参数封装到 Map 中去
           Object param = method.convertArgsToSqlCommandParam(args);
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional() &&
@@ -130,7 +135,7 @@ public class MapperMethod {
       RowBounds rowBounds = method.extractRowBounds(args);
       sqlSession.select(command.getName(), param, rowBounds, method.extractResultHandler(args));
     } else {
-      sqlSession.select(command.getName(), param, method.extractResultHandler(args)); 
+      sqlSession.select(command.getName(), param, method.extractResultHandler(args));
     }
   }
 
@@ -221,6 +226,7 @@ public class MapperMethod {
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
       final String methodName = method.getName();
       final Class<?> declaringClass = method.getDeclaringClass();
+      // 根据接口、调用的方法名以及方法所在的类去寻找MappedStatement
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass,
           configuration);
       if (ms == null) {
@@ -251,11 +257,14 @@ public class MapperMethod {
     private MappedStatement resolveMappedStatement(Class<?> mapperInterface, String methodName,
         Class<?> declaringClass, Configuration configuration) {
       String statementId = mapperInterface.getName() + "." + methodName;
+      // 根据 statementId 从 configuration 中的 mappedStatements Map 集合中去找是否有此 MappedStatement
+      // 如果没有而且被代理的接口是此方法所在的类则直接返回null
       if (configuration.hasStatement(statementId)) {
         return configuration.getMappedStatement(statementId);
       } else if (mapperInterface.equals(declaringClass)) {
         return null;
       }
+      // 从其实现的接口找
       for (Class<?> superInterface : mapperInterface.getInterfaces()) {
         if (declaringClass.isAssignableFrom(superInterface)) {
           MappedStatement ms = resolveMappedStatement(superInterface, methodName,

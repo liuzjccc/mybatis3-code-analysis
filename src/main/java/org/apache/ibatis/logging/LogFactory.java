@@ -31,6 +31,14 @@ public final class LogFactory {
   private static Constructor<? extends Log> logConstructor;
 
   static {
+
+    // 以下代码等价于：
+    //     tryImplementation(new Runnable() {
+    //       @Override
+    //       public void run() {
+    //         useSlf4jLogging();
+    //       }
+    //     });
     tryImplementation(LogFactory::useSlf4jLogging);
     tryImplementation(LogFactory::useCommonsLogging);
     tryImplementation(LogFactory::useLog4J2Logging);

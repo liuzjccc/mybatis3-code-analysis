@@ -125,6 +125,7 @@ public class MapperAnnotationBuilder {
   public void parse() {
     String resource = type.toString();
     if (!configuration.isResourceLoaded(resource)) {
+      // 此处是判断，如果这个Mapper没有被解析则会重新解析，重新返回到XmlMapperBuilder.parse()
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());

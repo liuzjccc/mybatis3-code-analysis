@@ -89,11 +89,13 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   public void parse() {
     if (!configuration.isResourceLoaded(resource)) {
+      // Mapper xml文件解析，由 XMLMapperBuilder 以及 XMLStatementBuilder（负责 select|insert|update|delete SQL解析） 完成
       configurationElement(parser.evalNode("/mapper"));
       configuration.addLoadedResource(resource);
+      // Mapper 接口注册，由 MapperAnnotationBuilder 完成
       bindMapperForNamespace();
     }
-
+    // 以下是清除上面操作失败的ResultMaps、CacheRefs以及Statements
     parsePendingResultMaps();
     parsePendingCacheRefs();
     parsePendingStatements();
@@ -110,11 +112,13 @@ public class XMLMapperBuilder extends BaseBuilder {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
       builderAssistant.setCurrentNamespace(namespace);
+      // 以下这些操作由 XMLMapperBuilder 完成解析
       cacheRefElement(context.evalNode("cache-ref"));
       cacheElement(context.evalNode("cache"));
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
       resultMapElements(context.evalNodes("/mapper/resultMap"));
       sqlElement(context.evalNodes("/mapper/sql"));
+      // select、insert、update、delete等SQL的解析由 XMLStatementBuilder 完成
       buildStatementFromContext(context.evalNodes("select|insert|update|delete"));
     } catch (Exception e) {
       throw new BuilderException("Error parsing Mapper XML. The XML location is '" + resource + "'. Cause: " + e, e);
