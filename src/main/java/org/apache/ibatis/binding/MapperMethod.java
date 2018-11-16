@@ -55,7 +55,7 @@ public class MapperMethod {
     Object result;
     switch (command.getType()) {
       case INSERT: {
-        // 每次执行都会将参数封装到 Map 中去
+        // 每次执行都会将参数封装到 Map 中去 (这行代码为啥不放到switch外面？)
     	Object param = method.convertArgsToSqlCommandParam(args);
     	// 然后传入 statementId 以及参数调用 SqlSession 的 insert 方法
         result = rowCountResult(sqlSession.insert(command.getName(), param));
